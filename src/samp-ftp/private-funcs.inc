@@ -58,6 +58,51 @@ stock _SampFTP_IsConnValid(connid)
 
 /**
     <summary>
+        Checks if a given connection is busy with requests.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect()
+    </param>
+    
+    <returns>
+        True if the connection is occupied, false otherwise.
+    </returns>
+*/
+stock _SampFTP_IsSocketOccupied(connid)
+{
+    if( (GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
+        < SAMPFTP_NO_RESPONSE_TIMEOUT ) {
+        SampFTP_errno = SAMPFTP_MESSAGE_IS_BEING_SENT;
+        return true;       
+    }
+    return false;
+}
+
+/**
+    <summary>
+        Checks if the connection is authenticated.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect()
+    </param>
+    
+    <returns>
+        False if the connection is not authenticated,
+        true otherwise.
+    </returns>
+*/
+stock _SampFTP_IsAuthenticated(connid)
+{
+    if( !_SampFTP_Connections[connid][AUTHENTICATED] ) {
+        SampFTP_errno = SAMPFTP_NOT_AUTHENTICATED;
+        return false;
+    }
+    return true;
+}
+/**
+    <summary>
         Clears a given samp-ftp connection.
     </summary>
 

@@ -130,22 +130,49 @@ stock SampFTP_Login(    connid,
     return;
 }
 
+/**
+    <summary>
+        Sends a request to an FTP server.
+    </summary>
 
-stock SampFTP_SendCommand(connid, cmd[])
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect().
+    </param>
+
+    <param name="cmd[]">
+        The command to be sent to the server.
+    </param>
+
+    <param name="callback[]">
+        The callback function used to handle responses to this
+        request.
+    </param>
+
+    <param name="id">
+        A unique identifier for distinguishing different responses
+        handled by the same callback function.
+    </param>
+    
+    <returns>
+        This function does not handle returns.
+    </returns>
+*/
+stock SampFTP_SendCommand(connid, cmd[], callback[], id)
 {
     if( !_SampFTP_IsConnValid(connid) ) return false;
- 
-    if( !_SampFTP_Connections[connid][AUTHENTICATED] ) {
-        SampFTP_errno = SAMPFTP_NOT_AUTHENTICATED;
-        return false;
-    }
-
+    if( _SampFTP_IsSocketOccupied(connid) ) return false;
+    if( !_SampFTP_IsAuthenticated(connid) ) return false;
 
     socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
                 cmd, strlen(cmd));
     socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
                 "\r\n", 2);
-    
+
+    _SampFTP_Connections[connid][MSG_SENT_AT] = GetTickCount();
+    _SampFTP_Connections[connid][MSG_UNIQUE_ID] = id;
+
+    memcpy( _SampFTP_Connections[connid][MSG_CALLBACK], callback, 0,
+            strlen(callback)*4, SAMPFTP_MAX_CALLBACK_LEN );    
     return true;
 }
 
@@ -191,6 +218,13 @@ stock SampFTP_CanProceed(connid)
         exists but the server hasn't sent the appropriate status code,
         1 otherwise.
     </returns>
+
+    <remarks>
+        This command does not check if the line is actually occupied by
+        another request. If you try to send a message through an occupied
+        socket, the error code SAMPFTP_MESSAGE_IS_BEING_SENT will be
+        set by the appropriate function.
+    </remarks>
 */
 stock SampFTP_IsReady(connid)
 {

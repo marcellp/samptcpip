@@ -35,6 +35,9 @@
 */
 stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
 {
+    // We got a response, so let's set MSG_SET_AT to 0.
+    _SampFTP_Connections[connid][MSG_SENT_AT] = 0;
+
     // Every FTP message should start with a status code
     // which is 3 digits long. The first digit is at least
     // 1, so we can set this to 0.
@@ -134,7 +137,12 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
             CallLocalFunction(  "SampFTP_AuthResponse", "ibs",
                                 connid, false, data);
         }
-            
+        default: {
+            CallLocalFunction(  _SampFTP_Connections[connid][MSG_CALLBACK],
+                                "is",
+                                _SampFTP_Connections[connid][MSG_UNIQUE_ID],
+                                data);
+        } 
     } 
 }
 
