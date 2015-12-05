@@ -138,10 +138,15 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
                                 connid, false, data);
         }
         default: {
-            CallLocalFunction(  _SampFTP_Connections[connid][MSG_CALLBACK],
-                                "is",
-                                _SampFTP_Connections[connid][MSG_UNIQUE_ID],
-                                data);
+            if( _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' )
+            {
+                CallLocalFunction(  _SampFTP_Connections[connid][MSG_CALLBACK],
+                                    "is",
+                                    _SampFTP_Connections[connid][MSG_UNIQUE_ID],
+                                    data);
+                _SampFTP_Connections[connid][MSG_CALLBACK][0] = '\0';
+                _SampFTP_Connections[connid][MSG_UNIQUE_ID] = 0;
+            }
         } 
     } 
 }

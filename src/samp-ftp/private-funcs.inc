@@ -71,8 +71,9 @@ stock _SampFTP_IsConnValid(connid)
 */
 stock _SampFTP_IsSocketOccupied(connid)
 {
-    if( (GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
-        < SAMPFTP_NO_RESPONSE_TIMEOUT ) {
+    if( ((GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
+        < SAMPFTP_NO_RESPONSE_TIMEOUT)
+        || _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' ) {
         SampFTP_errno = SAMPFTP_MESSAGE_IS_BEING_SENT;
         return true;       
     }
