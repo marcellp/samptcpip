@@ -19,7 +19,7 @@
 #define SAMPFTP_MAX_CREDENTIAL_LEN 50
 
 // The maximum length of a path
-#define SAMPFTP_MAX_HOST_NAME 50
+#define SAMPFTP_MAX_PATH_NAME 50
 
 // The time after which a new mesage can be sent if the
 // previous one hasn't been processed by the server yet.

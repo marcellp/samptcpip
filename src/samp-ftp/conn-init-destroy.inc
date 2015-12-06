@@ -154,7 +154,8 @@ stock SampFTP_Login(    connid,
     </param>
     
     <returns>
-        This function does not handle returns.
+        False if the message could not be sent through the socket,
+        true otherwise.
     </returns>
 */
 stock SampFTP_SendCommand(connid, cmd[], callback[], id)

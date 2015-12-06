@@ -102,6 +102,7 @@ stock _SampFTP_IsAuthenticated(connid)
     }
     return true;
 }
+
 /**
     <summary>
         Clears a given samp-ftp connection.
