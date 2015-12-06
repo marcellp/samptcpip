@@ -63,9 +63,6 @@ stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
             code += (data[i] - '0');
     }
 
-    // Call a callback function.
-    CallLocalFunction("SampFTP_Response", "iis", connid, code, data);
-
     // Print the code for debug purposes.
     printf("code: %d", code);
 

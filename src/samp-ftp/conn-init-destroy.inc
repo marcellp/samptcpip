@@ -325,3 +325,5 @@ stock _SampFTP_DestroyConn(connid)
     _SampFTP_ClearConn(connid);
     return true;
 }
+
+stock _SampFTP_Establish
