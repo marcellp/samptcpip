@@ -17,7 +17,7 @@
 #include <samptcpip/samp-ftp/conn-init-destroy.inc>
 #include <samptcpip/samp-ftp/ftp-pi.inc>
 #include <samptcpip/samp-ftp/private-funcs.inc>
-
 #include <samptcpip/samp-ftp/callbacks.inc>
+#include <samptcpip/samp-ftp/api-funcs.inc>
 
 #include <samptcpip/global/shared-private.inc>

@@ -137,12 +137,22 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
         default: {
             if( _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' )
             {
-                CallLocalFunction(  _SampFTP_Connections[connid][MSG_CALLBACK],
-                                    "is",
-                                    _SampFTP_Connections[connid][MSG_UNIQUE_ID],
-                                    data);
+                // CallLocalFunction() will call the callback before
+                // MSG_CALLBACK gets set to zero. This means that any SampFTP
+                // functions within the library that check for an idle line
+                // will NOT work. Fix this by creating temporary buffers and
+                // using those instead of the actual private variables.
+                new callback[SAMPFTP_MAX_CALLBACK_LEN];
+                new uid = _SampFTP_Connections[connid][MSG_UNIQUE_ID];
+
+                memcpy( callback, _SampFTP_Connections[connid][MSG_CALLBACK], 0,
+                        strlen(_SampFTP_Connections[connid][MSG_CALLBACK])*4,
+                        SAMPFTP_MAX_CALLBACK_LEN );  
+
                 _SampFTP_Connections[connid][MSG_CALLBACK][0] = '\0';
                 _SampFTP_Connections[connid][MSG_UNIQUE_ID] = 0;
+
+                CallLocalFunction(  callback, "iiis", connid, code, uid, data);
             }
         } 
     } 
@@ -156,6 +166,10 @@ public onSocketAnswer(Socket:id, data[])
             _SampFTP_ProtocolInterpreter(i, id, data);
             break;
         }
+        if( is_socket_valid(_SampFTP_Connections[i][DATA_CONN])
+            && _SampFTP_Connections[i][DATA_CONN] == id ) {
+            break;
+        }        
     }
 }
 

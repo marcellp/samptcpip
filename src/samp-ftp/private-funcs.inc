@@ -71,9 +71,12 @@ stock _SampFTP_IsConnValid(connid)
 */
 stock _SampFTP_IsSocketOccupied(connid)
 {
-    if( ((GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
-        < SAMPFTP_NO_RESPONSE_TIMEOUT)
-        || _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' ) {
+    if( (   _SampFTP_Connections[connid][MSG_SENT_AT] != 0 &&
+            (
+                (GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
+                < SAMPFTP_NO_RESPONSE_TIMEOUT
+            )
+        ) || _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' ) {
         SampFTP_errno = SAMPFTP_MESSAGE_IS_BEING_SENT;
         return true;       
     }
@@ -120,11 +123,11 @@ stock _SampFTP_ClearConn(connid)
 {
     if( !_PawnTest_CheckSuiteBounds(connid) ) return;
 
-    if( is_socket_valid(_SampFTP_Connections[connid][CONNSOCKET]) )
-        socket_destroy(_SampFTP_Connections[connid][CONNSOCKET]);
+    if( is_socket_valid(_SampFTP_Connections[connid][CONTROL_CONN]) )
+        socket_destroy(_SampFTP_Connections[connid][CONTROL_CONN]);
 
-    if( is_socket_valid(_SampFTP_Connections[connid][TRANSFERSOCKET]) )
-        socket_destroy(_SampFTP_Connections[connid][TRANSFERSOCKET]);
+    if( is_socket_valid(_SampFTP_Connections[connid][DATA_CONN]) )
+        socket_destroy(_SampFTP_Connections[connid][DATA_CONN]);
 
     for(new i = 0; _E_SAMPFTP_CONN:i < _E_SAMPFTP_CONN; i++) {
         _SampFTP_Connections[connid][_E_SAMPFTP_CONN:i] = 0;

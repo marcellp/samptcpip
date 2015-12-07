@@ -132,53 +132,6 @@ stock SampFTP_Login(    connid,
 
 /**
     <summary>
-        Sends a request to an FTP server.
-    </summary>
-
-    <param name="connid">
-        The ID of the connection returned by SampFTP_Connect().
-    </param>
-
-    <param name="cmd[]">
-        The command to be sent to the server.
-    </param>
-
-    <param name="callback[]">
-        The callback function used to handle responses to this
-        request.
-    </param>
-
-    <param name="id">
-        A unique identifier for distinguishing different responses
-        handled by the same callback function.
-    </param>
-    
-    <returns>
-        False if the message could not be sent through the socket,
-        true otherwise.
-    </returns>
-*/
-stock SampFTP_SendCommand(connid, cmd[], callback[], id)
-{
-    if( !_SampFTP_IsConnValid(connid) ) return false;
-    if( _SampFTP_IsSocketOccupied(connid) ) return false;
-    if( !_SampFTP_IsAuthenticated(connid) ) return false;
-
-    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
-                cmd, strlen(cmd));
-    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
-                "\r\n", 2);
-
-    _SampFTP_Connections[connid][MSG_SENT_AT] = GetTickCount();
-    _SampFTP_Connections[connid][MSG_UNIQUE_ID] = id;
-
-    memcpy( _SampFTP_Connections[connid][MSG_CALLBACK], callback, 0,
-            strlen(callback)*4, SAMPFTP_MAX_CALLBACK_LEN );    
-    return true;
-}
-
-/**
-    <summary>
         Checks if the connection instance can be used to
         send FTP commands.
     </summary>
@@ -253,15 +206,23 @@ stock SampFTP_IsReady(connid)
         The port (21 is the default ftp port) of the server.
     </param>
 
+    <param name="bool:data">
+        If true, this is a data connection instead of a control connection.
+    </param>
+
     <returns>
         True if the connection was successful, false otherwise.
     </returns>
 */
-stock _SampFTP_ConnectSock_NoTLS(connid, host[], port)
+stock _SampFTP_ConnectSock_NoTLS(connid, host[], port, bool:data = false)
 {
-    new Socket:sock =
-        _SampFTP_Connections[connid][CONTROL_CONN] =
-        socket_create(TCP);
+    new Socket:sock;
+
+    if( !data ) {
+        sock = _SampFTP_Connections[connid][CONTROL_CONN] = socket_create(TCP);
+    } else {
+        sock = _SampFTP_Connections[connid][DATA_CONN] = socket_create(TCP);        
+    }
 
     if( !is_socket_valid(sock) ) {
         SampFTP_errno = SAMPFTP_SOCKET_CREATION_FAILED;
@@ -292,6 +253,7 @@ stock _SampFTP_InitConn()
     for( new i = 0; i<SAMPFTP_MAX_CONNS; i++ ) {
         if( !_SampFTP_Connections[i][INITIALIZED] ) {
             _SampFTP_Connections[i][INITIALIZED] = true;
+            _SampFTP_Connections[i][DATA_CONN] = Socket:-1;
             return i;
         }
     }
@@ -325,5 +287,3 @@ stock _SampFTP_DestroyConn(connid)
     _SampFTP_ClearConn(connid);
     return true;
 }
-
-stock _SampFTP_Establish
