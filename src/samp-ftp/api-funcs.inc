@@ -80,7 +80,7 @@ stock bool:SampFTP_EnablePassiveMode(connid, callback[], id = 0)
 
 /**
     <summary>
-        Analyzes a given piece of data for PASV data.
+        Analyzes a given piece of data for PASV information.
     </summary>
 
     <param name="&ip_ref">
@@ -98,7 +98,7 @@ stock bool:SampFTP_EnablePassiveMode(connid, callback[], id = 0)
 
     <remarks>
         This function aims to support as many different PASV implementations
-        as possible, but it will generate a lot of false negatives if the
+        as possible, but it will generate a lot of false positives if the
         server deliberately tries to send malformed input such as:
 
         11bar2, foo55,,,111,0.
