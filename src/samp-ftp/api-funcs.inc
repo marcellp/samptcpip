@@ -57,9 +57,9 @@ stock bool:SampFTP_SendCommand(connid, cmd[], callback[], id = 0)
     _SampFTP_Connections[connid][MSG_UNIQUE_ID] = id;
     
     memcpy( _SampFTP_Connections[connid][MSG_CALLBACK], callback, 0,
-            strlen(callback)*4, SAMPFTP_MAX_CALLBACK_LEN );
+            strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
 
-    printf("sendcommand");
+    printf("lol: %s", _SampFTP_Connections[connid][MSG_CALLBACK]);
 
     return true;
 }
@@ -71,7 +71,7 @@ stock bool:SampFTP_EnablePassiveMode(connid, callback[], id = 0)
     if( _SampFTP_IsSocketOccupied(connid) ) return false;    
 
     memcpy( _SampFTP_Connections[connid][TRANSFER_CALLBACK], callback, 0,
-            strlen(callback)*4, SAMPFTP_MAX_CALLBACK_LEN );
+            strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
     _SampFTP_Connections[connid][TRANSFER_STATE] = _SAMPFTP_PASV_CALLBACK;
     _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID] = id;
 
@@ -217,7 +217,7 @@ public _SampFTP_Passive_Call(connid, code, id, data[])
     new uid = _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID];
 
     memcpy( callback, _SampFTP_Connections[connid][TRANSFER_CALLBACK], 0,
-            strlen(_SampFTP_Connections[connid][TRANSFER_CALLBACK])*4,
+            strlen(_SampFTP_Connections[connid][TRANSFER_CALLBACK])*4 + 1,
             SAMPFTP_MAX_CALLBACK_LEN );  
 
     _SampFTP_Connections[connid][TRANSFER_CALLBACK][0] = '\0';

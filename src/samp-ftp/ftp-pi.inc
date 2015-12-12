@@ -146,7 +146,7 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
                 new uid = _SampFTP_Connections[connid][MSG_UNIQUE_ID];
 
                 memcpy( callback, _SampFTP_Connections[connid][MSG_CALLBACK], 0,
-                        strlen(_SampFTP_Connections[connid][MSG_CALLBACK])*4,
+                        strlen(_SampFTP_Connections[connid][MSG_CALLBACK])*4+1,
                         SAMPFTP_MAX_CALLBACK_LEN );  
 
                 _SampFTP_Connections[connid][MSG_CALLBACK][0] = '\0';
@@ -160,16 +160,17 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
 
 public onSocketAnswer(Socket:id, data[])
 {
+    printf("id: %d, data: %s", _:id, data);
     for( new i = 0; i<SAMPFTP_MAX_CONNS; i++ ) {
         if( is_socket_valid(_SampFTP_Connections[i][CONTROL_CONN])
             && _SampFTP_Connections[i][CONTROL_CONN] == id ) {
             _SampFTP_ProtocolInterpreter(i, id, data);
             break;
-        }
+        }/*
         if( is_socket_valid(_SampFTP_Connections[i][DATA_CONN])
             && _SampFTP_Connections[i][DATA_CONN] == id ) {
             break;
-        }        
+        }  */      
     }
 }
 

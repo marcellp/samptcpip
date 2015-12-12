@@ -108,10 +108,10 @@ stock SampFTP_Login(    connid,
     }
 
     memcpy( _SampFTP_Connections[connid][USERNAME], user, 0,
-            strlen(user)*4, SAMPFTP_MAX_CREDENTIAL_LEN );
+            strlen(user)*4 + 1, SAMPFTP_MAX_CREDENTIAL_LEN );
 
     memcpy( _SampFTP_Connections[connid][PASSWORD], password, 0,
-            strlen(password)*4, SAMPFTP_MAX_CREDENTIAL_LEN );
+            strlen(password)*4 + 1, SAMPFTP_MAX_CREDENTIAL_LEN );
 
     if( _SampFTP_Connections[connid][AUTHENTICATED] ) {
         SampFTP_errno = SAMPFTP_ALREADY_AUTHENTICATED;
@@ -234,6 +234,7 @@ stock _SampFTP_ConnectSock_NoTLS(connid, host[], port, bool:data = false)
         return false;
     }
 
+    printf("successfully connected to %s @ %d, data: %b", host, port, data);
     return true;
 }
 
