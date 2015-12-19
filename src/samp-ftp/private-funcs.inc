@@ -71,6 +71,8 @@ stock _SampFTP_IsConnValid(connid)
 */
 stock _SampFTP_IsSocketOccupied(connid)
 {
+    if( !_SampFTP_CheckConnBounds(connid) ) return false;
+
     if( (   _SampFTP_Connections[connid][MSG_SENT_AT] != 0 &&
             (
                 (GetTickCount() - _SampFTP_Connections[connid][MSG_SENT_AT])
@@ -81,6 +83,31 @@ stock _SampFTP_IsSocketOccupied(connid)
         return true;       
     }
     return false;
+}
+
+/**
+    <summary>
+        Checks if there is an established data connection.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect()
+    </param>
+    
+    <returns>
+        True if there is an established data connection, false otherwise.
+    </returns>
+*/
+stock _SampFTP_IsDataConnUp(connid)
+{
+    if( !_SampFTP_CheckConnBounds(connid) ) return false;
+
+    if( !is_socket_valid(_SampFTP_Connections[connid][DATA_CONN]) ) {
+        SampFTP_errno = SAMPFTP_NO_DATA_CONN;
+        return false;
+    }
+
+    return true;
 }
 
 /**

@@ -34,3 +34,28 @@
     </returns>
 */
 forward SampFTP_AuthResponse(connid, bool:success, data[]);
+
+/**
+    <summary>
+        This callback is called when the server closes a data connection.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect().
+    </param>
+
+    <param name="callback[]">
+        The name of the callback function that got all incoming data
+        from the data connection.
+    </param>
+
+    <param name="uid">
+        The unique ID used by the user to distinguish different types of
+        data sent to the same callback.
+    </param>
+     
+    <returns>
+        This callback does not handle returns.
+    </returns>
+*/
+forward SampFTP_CloseDatConn(connid, callback[], uid);

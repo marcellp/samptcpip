@@ -22,6 +22,96 @@
         The command to be sent to the server.
     </param>
 
+    <param name="callback[]=\"\"">
+        The callback function used to handle responses to this
+        request. If no callback function is specified, the response
+        will still be interpreted but it won't be reported on.
+    </param>
+
+    <param name="id = 0">
+        A unique identifier for distinguishing different responses
+        handled by the same callback function.
+    </param>
+    
+    <returns>
+        False if the message could not be sent through the socket,
+        true otherwise.
+    </returns>
+*/
+stock bool:SampFTP_SendCommand(connid, cmd[], callback[] = "", id = 0)
+{
+    if( !_SampFTP_IsConnValid(connid) ) return false;
+    if( !_SampFTP_IsAuthenticated(connid) ) return false;
+    if( _SampFTP_IsSocketOccupied(connid) ) return false;
+
+    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
+                cmd, strlen(cmd));
+    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
+                "\r\n", 2);
+
+    if( callback[0] != '\0' ) {
+        _SampFTP_Connections[connid][MSG_SENT_AT] = GetTickCount();
+        _SampFTP_Connections[connid][MSG_UNIQUE_ID] = id;
+        
+        memcpy( _SampFTP_Connections[connid][MSG_CALLBACK], callback, 0,
+                strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
+    }
+
+    return true;
+}
+
+/**
+    <summary>
+        Enable passive mode.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect().
+    </param>
+
+    <param name="callback[]">
+        The callback function used to handle the server's response
+        to this request.
+    </param>
+
+    <param name="id">
+        A unique identifier for distinguishing different responses
+        handled by the same callback function.
+    </param>
+    
+    <returns>
+        False if the message could not be sent through the socket,
+        true otherwise.
+    </returns>
+*/
+stock bool:SampFTP_EnablePassiveMode(connid, callback[], id = 0)
+{
+    if( !_SampFTP_IsConnValid(connid) ) return false;
+    if( !_SampFTP_IsAuthenticated(connid) ) return false;
+    if( _SampFTP_IsSocketOccupied(connid) ) return false;   
+    
+    memcpy( _SampFTP_Connections[connid][TRANSFER_CALLBACK], callback, 0,
+            strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
+    _SampFTP_Connections[connid][TRANSFER_STATE] = _SAMPFTP_PASV_CALLBACK;
+    _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID] = id;
+
+    return SampFTP_SendCommand(connid, "PASV", "_SampFTP_Passive_Call");
+}
+
+/**
+    <summary>
+        Retrieves a file, a directory or some other data sent by
+        the server through the data connection.
+    </summary>
+
+    <param name="connid">
+        The ID of the connection returned by SampFTP_Connect().
+    </param>
+
+    <param name="cmd[]">
+        The command to be sent to the server.
+    </param>
+
     <param name="callback[]">
         The callback function used to handle responses to this
         request.
@@ -37,137 +127,19 @@
         true otherwise.
     </returns>
 */
-stock bool:SampFTP_SendCommand(connid, cmd[], callback[], id = 0)
+stock bool:SampFTP_RetrieveData(connid, cmd[], callback[], id = 0)
 {
     if( !_SampFTP_IsConnValid(connid) ) return false;
     if( !_SampFTP_IsAuthenticated(connid) ) return false;
     if( _SampFTP_IsSocketOccupied(connid) ) return false;
+    if( !_SampFTP_IsDataConnUp(connid) ) return false;
 
-    if( strlen(callback) == 0 ) {
-        SampFTP_errno = SAMPFTP_STR_OUT_OF_BOUNDS;
-        return false;
-    }
-
-    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
-                cmd, strlen(cmd));
-    socket_send(_SampFTP_Connections[connid][CONTROL_CONN],
-                "\r\n", 2);
-
-    _SampFTP_Connections[connid][MSG_SENT_AT] = GetTickCount();
-    _SampFTP_Connections[connid][MSG_UNIQUE_ID] = id;
-    
-    memcpy( _SampFTP_Connections[connid][MSG_CALLBACK], callback, 0,
-            strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
-
-    return true;
-}
-
-stock bool:SampFTP_EnablePassiveMode(connid, callback[], id = 0)
-{
-    if( !_SampFTP_IsConnValid(connid) ) return false;
-    if( !_SampFTP_IsAuthenticated(connid) ) return false;
-    if( _SampFTP_IsSocketOccupied(connid) ) return false;    
-    
     memcpy( _SampFTP_Connections[connid][TRANSFER_CALLBACK], callback, 0,
             strlen(callback)*4 + 1, SAMPFTP_MAX_CALLBACK_LEN );
-    _SampFTP_Connections[connid][TRANSFER_STATE] = _SAMPFTP_PASV_CALLBACK;
+    _SampFTP_Connections[connid][TRANSFER_STATE] = _SAMPFTP_RET_TEXT;
     _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID] = id;
 
-    return SampFTP_SendCommand(connid, "PASV", "_SampFTP_Passive_Call");
-}
-
-/**
-    <summary>
-        Analyzes a given piece of data for PASV information.
-    </summary>
-
-    <param name="&ip_ref">
-        A 32-bit number for the given IP address, passed by reference.
-    </param>
-
-    <param name="&port_ref">
-        A number for the parsed port, passed by reference.
-    </param>
-
-    <returns>
-        True if the numbers parsed by the argument within one "block"
-        are within the byte range (0-255), false otherwise.
-    </returns>
-
-    <remarks>
-        This function aims to support as many different PASV implementations
-        as possible, but it will generate a lot of false positives if the
-        server deliberately tries to send malformed input such as:
-
-        11bar2, foo55,,,111,0.
-
-        Malformed input shouldn't be able to generate invalid IP addresses
-        or port numbers, though.
-
-        For this function to work, the data[] variable should contain the
-        COMPLETE 227 response sent by the server.
-    </remarks>
-*/
-stock bool:_SampFTP_ParsePASV(data[], &ip_ref, &port_ref)
-{
-    /* 0: first byte of ip
-       1: second byte of ip
-       2: third byte of ip
-       3: fourth byte of ip
-       4: first byte of port
-       5: second byte of port
-    */
-    new parse_state = 0;
-
-    // The accumulator that stores the value of the specific byte.
-    new acc = 0;
-
-    // The variable for storing the IP address.
-    new ip = 0;
-
-    // The variable for storing the port.
-    new port = 0;
-
-    // The first 3 bits represent the status code.
-    for( new i = 3; i<strlen(data); i++ ) {
-        if( parse_state > 5 )
-            break;
-
-        if( data[i] >= '0' && data[i] <= '9' ) {
-            acc = (acc * 10) + (data[i] - '0');
-        } else if( (parse_state < 5 && data[i] == ',')
-                    || (parse_state == 5
-                        && ( data[i] == ',' || data[i] == '\r'
-                            || data[i] == '\n' || data[i] == ')'
-                            || data[i] == '\0'
-                            )
-                        )
-                    ) 
-        {
-            if( acc > 255 )
-                return false;
-
-            if( parse_state == 0 )
-                ip += acc << 24;
-            else if( parse_state == 1 )
-                ip += acc << 16;
-            else if( parse_state == 2 )
-                ip += acc << 8;
-            else if( parse_state == 3 )
-                ip += acc;
-            else if( parse_state == 4 )
-                port += acc << 8;
-            else if( parse_state == 5 )
-                port += acc;
-
-            acc = 0;
-            parse_state++;
-        }
-    }
-
-    ip_ref = ip;
-    port_ref = port;
-    return true;
+    return SampFTP_SendCommand(connid, cmd, "");
 }
 
 forward _SampFTP_Passive_Call(connid, code, id, data[]);
