@@ -66,7 +66,7 @@ stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
     // Print the code for debug purposes.
     printf("code: %d", code);
 
-    _PawnFtp_ProcessMessage(connid, id, code, data);
+    _SampFTP_ProcessMessage(connid, id, code, data);
 }
 
 /**
@@ -95,7 +95,7 @@ stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
         This function does not handle returns.
     </returns>
 */
-_PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
+_SampFTP_ProcessMessage(connid, Socket:id, code, data[])
 {
     #pragma unused data
 
@@ -160,17 +160,17 @@ _PawnFtp_ProcessMessage(connid, Socket:id, code, data[])
 
 public onSocketAnswer(Socket:id, data[])
 {
-    printf("id: %d, data: %s", _:id, data);
     for( new i = 0; i<SAMPFTP_MAX_CONNS; i++ ) {
         if( is_socket_valid(_SampFTP_Connections[i][CONTROL_CONN])
             && _SampFTP_Connections[i][CONTROL_CONN] == id ) {
             _SampFTP_ProtocolInterpreter(i, id, data);
             break;
-        }/*
-        if( is_socket_valid(_SampFTP_Connections[i][DATA_CONN])
+        }
+        else if( is_socket_valid(_SampFTP_Connections[i][DATA_CONN])
             && _SampFTP_Connections[i][DATA_CONN] == id ) {
+            printf("%s",data);
             break;
-        }  */      
+        }
     }
 }
 
@@ -180,4 +180,4 @@ public onSocketAnswer(Socket:id, data[])
 #else
     #define _ALS_onSocketAnswer
 #endif
-#define onSocketAnswer _PawnFtp_onSocketAnswer
+#define onSocketAnswer _SampFTP_onSocketAnswer

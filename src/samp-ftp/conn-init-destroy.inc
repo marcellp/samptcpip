@@ -233,8 +233,6 @@ stock _SampFTP_ConnectSock_NoTLS(connid, host[], port, bool:data = false)
         SampFTP_errno = SAMPFTP_CONNECTION_FAILED;
         return false;
     }
-
-    printf("successfully connected to %s @ %d, data: %b", host, port, data);
     return true;
 }
 
