@@ -10,7 +10,6 @@
  */
 
 #include <socket>      // This library depends on BlueG's Socket Plugin include
-#include <strlib.h>    // This library depends on the strlib include
 
 #include <samptcpip/samp-ftp/config.inc>
 #include <samptcpip/samp-ftp/main.inc>
