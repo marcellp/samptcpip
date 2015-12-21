@@ -17,7 +17,7 @@
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         False if the array index is out of bounds, true otherwise.
     </returns>
@@ -39,7 +39,7 @@ stock _SampFTP_CheckConnBounds(connid)
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         False if the connection ID is invalid, true otherwise.
     </returns>
@@ -64,7 +64,7 @@ stock _SampFTP_IsConnValid(connid)
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         True if the connection is occupied, false otherwise.
     </returns>
@@ -80,7 +80,7 @@ stock _SampFTP_IsSocketOccupied(connid)
             )
         ) || _SampFTP_Connections[connid][MSG_CALLBACK][0] != '\0' ) {
         SampFTP_errno = SAMPFTP_MESSAGE_IS_BEING_SENT;
-        return true;       
+        return true;
     }
     return false;
 }
@@ -93,7 +93,7 @@ stock _SampFTP_IsSocketOccupied(connid)
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         True if there is an established data connection, false otherwise.
     </returns>
@@ -118,7 +118,7 @@ stock _SampFTP_IsDataConnUp(connid)
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         False if the connection is not authenticated,
         true otherwise.
@@ -141,7 +141,7 @@ stock _SampFTP_IsAuthenticated(connid)
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         This function does not handle returns.
     </returns>

@@ -28,7 +28,7 @@
     <param name="data[]">
         The action you want to perform.
     </param>
-     
+
     <returns>
         This function does not handle returns.
     </returns>
@@ -47,7 +47,7 @@ stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
     // care.
     if( strlen(data) < 3 )
         return;
-    
+
     // Check if the first 3 characters are numeric. If so,
     // add them to the code. Also, pawn has no native
     // exponentiation operation so this is my hacky alternative.
@@ -90,7 +90,7 @@ stock _SampFTP_ProtocolInterpreter(connid, Socket:id, data[])
     <param name="data[]">
         The raw data sent by the server.
     </param>
-     
+
     <returns>
         This function does not handle returns.
     </returns>
@@ -135,14 +135,14 @@ _SampFTP_ProcessMessage(connid, Socket:id, code, data[])
                 }
 
                 // Just to be safe, reset this too.
-                
+
                 _SampFTP_Connections[connid][DATA_CONN] = Socket:-1;
 
                 // CallLocalFunction() will call the callback before
                 // MSG_CALLBACK gets set to zero. This means that any SampFTP
                 // functions within the library that check for an idle line
                 // will NOT work. Fix this by creating temporary buffers and
-                // using those instead of the actual private variables.                
+                // using those instead of the actual private variables.
 
                 new callback[SAMPFTP_MAX_CALLBACK_LEN];
                 new uid = _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID];
@@ -155,7 +155,7 @@ _SampFTP_ProcessMessage(connid, Socket:id, code, data[])
 
                 _SampFTP_Connections[connid][TRANSFER_CALLBACK][0] = '\0';
                 _SampFTP_Connections[connid][TRANSFER_UNIQUE_ID] = 0;
-                _SampFTP_Connections[connid][TRANSFER_STATE] = 0;   
+                _SampFTP_Connections[connid][TRANSFER_STATE] = 0;
 
                 CallLocalFunction( "SampFTP_CloseDatConn", "isi", connid,
                                     callback, uid);
@@ -187,15 +187,15 @@ _SampFTP_ProcessMessage(connid, Socket:id, code, data[])
 
                 memcpy( callback, _SampFTP_Connections[connid][MSG_CALLBACK], 0,
                         strlen(_SampFTP_Connections[connid][MSG_CALLBACK])*4+1,
-                        SAMPFTP_MAX_CALLBACK_LEN );  
+                        SAMPFTP_MAX_CALLBACK_LEN );
 
                 _SampFTP_Connections[connid][MSG_CALLBACK][0] = '\0';
                 _SampFTP_Connections[connid][MSG_UNIQUE_ID] = 0;
 
                 CallLocalFunction(  callback, "iiis", connid, code, uid, data);
             }
-        } 
-    } 
+        }
+    }
 }
 
 /**
@@ -264,7 +264,7 @@ stock bool:_SampFTP_ParsePASV(data[], &ip_ref, &port_ref)
                             || data[i] == '\0'
                             )
                         )
-                    ) 
+                    )
         {
             if( acc > 255 )
                 return false;

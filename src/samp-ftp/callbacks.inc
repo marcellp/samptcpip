@@ -28,7 +28,7 @@
         error message (if success == false) or the welcome message
         of the server (may contain useful information).
     </param>
-     
+
     <returns>
         This callback does not handle returns.
     </returns>
@@ -53,7 +53,7 @@ forward SampFTP_AuthResponse(connid, bool:success, data[]);
         The unique ID used by the user to distinguish different types of
         data sent to the same callback.
     </param>
-     
+
     <returns>
         This callback does not handle returns.
     </returns>

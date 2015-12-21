@@ -20,7 +20,7 @@
 
     <param name="port = 21">
         The host name or IP address to connect to.
-    </param>    
+    </param>
 
     <param name="user[] = \"anonymous\"">
         The user to log in as. If no user is specified, it defaults
@@ -35,8 +35,8 @@
 
     <param name="bool:tls">
         Whether TLS support is needed.
-    </param>    
-    
+    </param>
+
     <returns>
         The ID of the connection if one could be created,
         -1 otherwise.
@@ -87,7 +87,7 @@ stock SampFTP_Connect(
         an e-mail address, as many FTP servers require anonymous users to
         log in with their e-mail address.
     </param>
-    
+
     <returns>
         This function does not handle returns.
     </returns>
@@ -221,12 +221,12 @@ stock _SampFTP_ConnectSock_NoTLS(connid, host[], port, bool:data = false)
     if( !data ) {
         sock = _SampFTP_Connections[connid][CONTROL_CONN] = socket_create(TCP);
     } else {
-        sock = _SampFTP_Connections[connid][DATA_CONN] = socket_create(TCP);        
+        sock = _SampFTP_Connections[connid][DATA_CONN] = socket_create(TCP);
     }
 
     if( !is_socket_valid(sock) ) {
         SampFTP_errno = SAMPFTP_SOCKET_CREATION_FAILED;
-        return false;     
+        return false;
     }
 
     if( !socket_connect(sock, host, port) ) {
@@ -256,7 +256,7 @@ stock _SampFTP_InitConn()
             return i;
         }
     }
-    
+
     SampFTP_errno = SAMPFTP_MAX_CONNS_REACHED;
     return -1;
 }
@@ -269,7 +269,7 @@ stock _SampFTP_InitConn()
     <param name="connid">
         The ID of the connection returned by SampFTP_Connect()
     </param>
-    
+
     <returns>
         True if the action was completed successfully, false otherwise.
     </returns>
@@ -282,7 +282,7 @@ stock _SampFTP_DestroyConn(connid)
         SampFTP_errno = SAMPFTP_OBJ_NOT_INITIALIZED;
         return false;
     }
-    
+
     _SampFTP_ClearConn(connid);
     return true;
 }
