@@ -6,6 +6,8 @@ their sanity. It uses BlueG's Socket plugin to provide a collection
 of libraries for TCP/IP-based application layer protocols like FTP,
 HTTP and DNS.
 
+**Note:** This project is abandoned due to a glitch in the SA:MP sockets plugin thas has not yet been fixed. The plugin may cause inadvertent crashes when fetching files from servers.
+
 License
 -------
 
